@@ -51,13 +51,13 @@ class UserResource extends Resource
                     ->label('Username')
                     ->readOnly(Auth::user()->role !== 'superadmin')
                     ->required()
-                    ->unique()
+                    ->unique(table: 'users', column: 'username', ignoreRecord: true) // Abaikan record yang sedang diperbarui
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->label('Email')
                     ->readOnly(Auth::user()->role !== 'superadmin')
                     ->email()
-                    ->unique()
+                    ->unique(table: 'users', column: 'email', ignoreRecord: true) // Abaikan record yang sedang diperbarui
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
@@ -65,6 +65,14 @@ class UserResource extends Resource
                     ->readOnly(Auth::user()->role !== 'superadmin')
                     ->tel()
                     ->required()
+                    ->unique(table: 'users', column: 'phone', ignoreRecord: true) // Abaikan record yang sedang diperbarui
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('password')
+                    ->label('Password')
+                    ->hidden(Auth::user()->role !== 'superadmin')
+                    ->required(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord) // Required hanya saat membuat baru
+                    ->password()
+                    ->revealable()
                     ->unique()
                     ->maxLength(255),
                 Forms\Components\Select::make('role')
@@ -148,5 +156,10 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()->role === 'superadmin'; // Hanya administrator yang dapat membuat user baru
     }
 }

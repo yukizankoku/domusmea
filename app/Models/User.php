@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 #[ObservedBy(UserObserver::class)]
 
@@ -87,6 +88,14 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function getFilamentAvatarUrl(): ?string
     {
         return $this->avatar_url;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        // Enkripsi password hanya jika nilai diberikan
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
     }
     
 }
