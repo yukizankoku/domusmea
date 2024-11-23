@@ -31,11 +31,13 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
+            'username' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9_]+$/', 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'regex:/^[0-9]{10,15}$/', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ],
+        ['username.regex' => 'Username hanya boleh terdiri dari huruf kecil, angka, dan garis bawah tanpa spasi.',
+        'phone.regex' => 'Nomor telepon hanya boleh terdiri dari angka (08123456789).']);
 
         $user = User::create([
             'name' => $request->name,

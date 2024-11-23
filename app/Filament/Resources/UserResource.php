@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
@@ -70,11 +71,17 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
                     ->hidden(Auth::user()->role !== 'superadmin')
+                    ->dehydrateStateUsing(fn ($state) => !empty($state) ? bcrypt($state) : null)
+                    ->dehydrated(fn ($state) => filled($state))
                     ->required(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord) // Required hanya saat membuat baru
                     ->password()
                     ->revealable()
-                    ->unique()
                     ->maxLength(255),
+                forms\Components\DatePicker::make('email_verified_at')
+                    ->label('Email Verified At')
+                    ->disabled(Auth::user()->role !== 'superadmin')
+                    ->hidden()
+                    ->default(now()),
                 Forms\Components\Select::make('role')
                     ->label('Role')
                     ->required()

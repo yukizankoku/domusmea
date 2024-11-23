@@ -89,13 +89,4 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     {
         return $this->avatar_url;
     }
-
-    public function setPasswordAttribute($value)
-    {
-        // Enkripsi password hanya jika nilai diberikan
-        if ($value) {
-            $this->attributes['password'] = bcrypt($value);
-        }
-    }
-    
 }
